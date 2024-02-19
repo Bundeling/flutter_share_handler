@@ -147,11 +147,10 @@ class ShareHandlerPlugin: FlutterPlugin, Messages.ShareHandlerApi, EventChannel.
   }
 
   override fun onNewIntent(intent: Intent): Boolean {
-    handleIntent(intent, false)
-    return false
+    return handleIntent(intent, false)
   }
 
-  private fun handleIntent(intent: Intent, initial: Boolean) {
+  private fun handleIntent(intent: Intent, initial: Boolean): Boolean {
     val attachments: List<Messages.SharedAttachment>?
     val text: String?
     when {
@@ -171,10 +170,10 @@ class ShareHandlerPlugin: FlutterPlugin, Messages.ShareHandlerApi, EventChannel.
           null
         }
       }
-      intent.action == Intent.ACTION_VIEW -> { // Opening URL
-        attachments = null
-        text = intent.dataString
-      }
+//      intent.action == Intent.ACTION_VIEW -> { // Opening URL
+//        attachments = null
+//        text = intent.dataString
+//      }
       else -> {
         attachments = null
         text = null
@@ -187,7 +186,10 @@ class ShareHandlerPlugin: FlutterPlugin, Messages.ShareHandlerApi, EventChannel.
       val media = Messages.SharedMedia.Builder().setAttachments(attachments).setContent(text).setConversationIdentifier(conversationIdentifier).build()
       if (initial) initialMedia = media
       eventSink?.success(media.toMap())
+      return true;
     }
+
+    return false;
   }
 
   private fun attachmentsFromIntent(intent: Intent?): List<Messages.SharedAttachment>? {
